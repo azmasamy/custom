@@ -73,16 +73,26 @@ class EstateProperty(models.Model):
             else:    
                 record.state = "canceled"
         return True
+
+    @api.onchange("offer_ids.status")
+    def set_selling_price_and_buyer(self):
+        print(self)
+        for offer in self.offer_ids:
+            if offer.status == "accepted":
+                self.selling_price = offer.price
+                self.buyer_id = offer.partner_id
+            else:
+                offer.status = "refused"
+                print(offer.status)
     
-    def set_selling_price_and_buyer(self, accepted_offer):
-        for record in self:
-            for offer in record.offer_ids:
-                if offer == accepted_offer:
-                    record.selling_price = offer.price
-                    print(record.selling_price)
-                    record.buyer_id = offer.partner_id
-                else:
-                    offer.status = "refused"
-                    print(offer.status)
-                
+    # def set_selling_price_and_buyer(self, accepted_offer):
+    #     for record in self:
+    #         for offer in record.offer_ids:
+    #             if offer == accepted_offer:
+    #                 record.selling_price = offer.price
+    #                 print(record.selling_price)
+    #                 record.buyer_id = offer.partner_id
+    #             else:
+    #                 offer.status = "refused"
+    #                 print(offer.status)
 

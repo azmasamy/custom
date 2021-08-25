@@ -39,13 +39,13 @@ class EstatePropertyOffer(models.Model):
     def accept_offer(self):
         for record in self:
                 record.status = "accepted"
-                self.env['estate.property'].set_selling_price_and_buyer(record)
+                # self.env['estate.property'].set_selling_price_and_buyer(record)
         return True
 
     def refuse_offer(self):
         for record in self:
                 record.status = "refused"
-                self.env['estate.property'].set_selling_price_and_buyer(record)
+                # self.env['estate.property'].set_selling_price_and_buyer(record)
         return True
 
     
