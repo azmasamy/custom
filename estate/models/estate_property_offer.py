@@ -6,16 +6,22 @@ import datetime
 class EstatePropertyOffer(models.Model):
     _name = "estate.property.offer"
     _description = "The property offers in the estate application"
+    _order = "price desc"
+    _sql_constraints = [
+        ('posistive_offer_price', 'CHECK(price > 0)', 'The offer price must be positve')
+    ]
+
 
     partner_id = fields.Many2one("res.partner", string="Buyer", required=True)
-    property_id = fields.Many2one("estate.property", string="Property", required=True)
-
     price = fields.Float()
     status = fields.Selection(
         selection=[("accepted", "Accepted"), ("refused", "Refused")], copy=False
     )
     validity = fields.Integer(default=7)
     date_deadline = fields.Date(compute="_compute_date_deadline", inverse="_compute_validity")
+    property_id = fields.Many2one("estate.property", string="Property", required=True)
+    property_type_id = fields.Many2one(related="property_id.type_id", stored=True)
+
 
     @api.depends("validity")
     def _compute_date_deadline(self):
@@ -38,15 +44,11 @@ class EstatePropertyOffer(models.Model):
     
     def accept_offer(self):
         for record in self:
-                record.status = "accepted"
-                # self.env['estate.property'].set_selling_price_and_buyer(record)
+            record.status = "accepted"
+            self.property_id.set_selling_price_and_buyer(record)
         return True
 
     def refuse_offer(self):
         for record in self:
-                record.status = "refused"
-                # self.env['estate.property'].set_selling_price_and_buyer(record)
+            record.status = "refused"
         return True
-
-    
-    

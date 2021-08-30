@@ -1,10 +1,11 @@
-from odoo import fields, models, api, exceptions
+from odoo import fields, models, api, exceptions, tools, exceptions
 from dateutil.relativedelta import relativedelta
 
 
 class EstateProperty(models.Model):
     _name = "estate.property"
     _description = "The properties in the estate application"
+    _order = "id desc"
 
     type_id = fields.Many2one("estate.property.type", string="Type")
     buyer_id = fields.Many2one("res.partner", string="Buyer", copy=False)
@@ -29,9 +30,21 @@ class EstateProperty(models.Model):
         selection=[('north', 'North'), ('south', 'South'), ('east', 'East'), ('west', 'West')],)
     active = fields.Boolean(default=True)
     state = fields.Selection(
-        selection=[('new', 'New'), ('offer received', 'Offer Received'), ('offer accepted', 'Offer Accepted'), ('sold', 'Sold'), ('canceled', 'Canceled')],)
+        selection=[('new', 'New'), ('offer received', 'Offer Received'), ('offer accepted', 'Offer Accepted'), ('sold', 'Sold'), ('canceled', 'Canceled')], default='new')
     total_area = fields.Integer(compute="_compute_total_area")
     best_price = fields.Float(compute="_compute_best_price")
+
+    _sql_constraints = [
+        ('posistive_expected_price', 'CHECK(expected_price > 0)', 'The expected price must be positve'),
+        ('posistive_selling_price', 'CHECK(selling_price > 0)', 'The selling price must be positve')
+    ]
+
+    @api.constrains('selling_price')
+    def _check_selling_price(self):
+        for record in self:
+            if not tools.float_is_zero(record.selling_price, precision_digits=2):
+                if tools.float_compare(record.selling_price, record.expected_price * .9, precision_digits=2) == -1:
+                    raise exceptions.ValidationError("The selling price cannot be lower than 90% of the expected price")
 
     @api.depends("living_area", "garden_area")
     def _compute_total_area(self):
@@ -74,25 +87,31 @@ class EstateProperty(models.Model):
                 record.state = "canceled"
         return True
 
-    @api.onchange("offer_ids.status")
-    def set_selling_price_and_buyer(self):
-        print(self)
-        for offer in self.offer_ids:
-            if offer.status == "accepted":
-                self.selling_price = offer.price
-                self.buyer_id = offer.partner_id
-            else:
-                offer.status = "refused"
-                print(offer.status)
+    # @api.onchange("offer_ids.status")
+    # def set_selling_price_and_buyer(self):
+    #     print(self)
+    #     for offer in self.offer_ids:
+    #         if offer.status == "accepted":
+    #             self.selling_price = offer.price
+    #             self.buyer_id = offer.partner_id
+    #         else:
+    #             offer.status = "refused"
+    #             print(offer.status)
     
-    # def set_selling_price_and_buyer(self, accepted_offer):
-    #     for record in self:
-    #         for offer in record.offer_ids:
-    #             if offer == accepted_offer:
-    #                 record.selling_price = offer.price
-    #                 print(record.selling_price)
-    #                 record.buyer_id = offer.partner_id
-    #             else:
-    #                 offer.status = "refused"
-    #                 print(offer.status)
+    def set_selling_price_and_buyer(self, accepted_offer):
+        for record in self:
+            for offer in record.offer_ids:
+                if offer == accepted_offer:
+                    record.selling_price = offer.price
+                    record.buyer_id = offer.partner_id
+                    record.state = "offer accepted"
+                else:
+                    offer.status = "refused"
+                    print(offer.status)
+
+    @api.onchange("offer_ids")
+    def _onchange_offer_ids(self):
+        if self.offer_ids:
+            if self.state == 'new':
+                self.state = 'offer received'
 

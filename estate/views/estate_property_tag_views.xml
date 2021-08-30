@@ -13,13 +13,13 @@
         <field name="name">estate.property.tag.tree</field>
         <field name="model">estate.property.tag</field>
         <field name="arch" type="xml">
-            <tree string="Tags">
+            <tree string="Tags" editable="bottom">
                 <field name="name"/>
             </tree>
         </field>
     </record>
 
-    <!-- Property TTag Form View Customization -->
+    <!-- Property Tag Form View Customization -->
     <record id="estate_property_tag_view_form" model="ir.ui.view">
         <field name="name">estate.property.tag.form</field>
         <field name="model">estate.property.tag</field>

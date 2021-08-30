@@ -1,18 +1,28 @@
 <?xml version="1.0"?>
 <odoo>
+
+    <!-- Type Properties Offers View Action -->
+    <record id="estate_property_offer_action" model="ir.actions.act_window">
+        <field name="name">Property Offers</field>
+        <field name="res_model">estate.property.offer</field>
+        <field name="view_mode">tree</field>
+        <field name="domain">[('property_type_id', '=', active_id)]</field>
+    </record>
+
     <!-- Properties Offer Tree View Customization -->
     <record id="estate_property_offer_view_tree" model="ir.ui.view">
         <field name="name">estate.property.offer.tree</field>
         <field name="model">estate.property.offer</field>
         <field name="arch" type="xml">
-            <tree string="Offers">
+            <tree string="Offers" editable="bottom" decoration-success="status=='accepted'" decoration-danger="status=='refused'">
                 <field name="price"/>
                 <field name="partner_id"/>
                 <field name="validity"/>
                 <field name="date_deadline"/>
-                <button name="accept_offer" type="object" icon="fa-check"/>
-                <button name="refuse_offer" type="object" icon="fa-times"/>
-                <field name="status"/>
+                <button name="accept_offer" type="object" icon="fa-check" attrs="{'invisible': [('status', '!=', False)]}"/>
+                <button name="refuse_offer" type="object" icon="fa-times" attrs="{'invisible': [('status', '!=', False)]}"/>
+                <field name="status" invisible="1"/>
+                <field name="property_type_id"/>
             </tree>
         </field>
     </record>
