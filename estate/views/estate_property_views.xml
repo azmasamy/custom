@@ -14,7 +14,7 @@
         <field name="name">estate.property.tree</field>
         <field name="model">estate.property</field>
         <field name="arch" type="xml">
-            <tree string="Properties" decoration-success="state=='offer received' or state=='offer accepted'" decoration-bf="state=='offer accepted'" decoration-muted="state=='sold'">
+            <tree string="Properties" decoration-success="state=='offer_received' or state=='offer_accepted'" decoration-bf="state=='offer_accepted'" decoration-muted="state=='sold'">
                 <field name="name"/>
                 <field name="tag_ids" widget="many2many_tags"/>
                 <field name="type_id"/>
@@ -36,10 +36,10 @@
         <field name="arch" type="xml">
             <form string="Property">
                 <header>
-                    <button name="sell_property" type="object" string="Sold" states="new,offer received"/>
-                    <button name="sell_property" type="object" string="Sold" states="offer accepted" class="oe_highlight"/>
-                    <button name="cancel_property" type="object" string="Cancel" states="new,offer received,offer accepted"/>
-                    <field name="state" widget="statusbar" statusbar_visible="new,offer received,offer accepted,sold"/>
+                    <button name="sell_property" type="object" string="Sold" states="new,offer_received"/>
+                    <button name="sell_property" type="object" string="Sold" states="offer_accepted" class="oe_highlight"/>
+                    <button name="cancel_property" type="object" string="Cancel" states="new,offer_received,offer_accepted"/>
+                    <field name="state" widget="statusbar" statusbar_visible="new,offer_received,offer_accepted,sold"/>
                 </header>
                 <sheet>
                     <h1 class="mb32">
@@ -74,7 +74,7 @@
                         </page>
                         <page string="Offers" accesskey="o">
                             <group>
-                                <field name="offer_ids" attrs="{'readonly': ['|', '|', ('state', '=', 'offer accepted'), ('state', '=', 'sold'), ('state', '=', 'canceled')]}"/>
+                                <field name="offer_ids" attrs="{'readonly': ['|', '|', ('state', '=', 'offer_accepted'), ('state', '=', 'sold'), ('state', '=', 'canceled')]}"/>
                             </group>
                         </page>
                         <page string="Other Info" accesskey="i">
@@ -102,7 +102,7 @@
                 <field name="bedrooms"/>
                 <field name="living_area" string="Living Area (sqm)" filter_domain="[('living_area', '>=', self)]"/>
                 <field name="facades"/>
-                <filter name="available" string="Available" domain="['|', ('state', '=', 'new'), ('state', '=', 'offer received')]"/>
+                <filter name="available" string="Available" domain="['|', ('state', '=', 'new'), ('state', '=', 'offer_received')]"/>
                 <filter name="postcode" string="Postcode" context="{'group_by':'postcode'}"/>
             </search>
         </field>

@@ -30,7 +30,7 @@ class EstateProperty(models.Model):
         selection=[('north', 'North'), ('south', 'South'), ('east', 'East'), ('west', 'West')],)
     active = fields.Boolean(default=True)
     state = fields.Selection(
-        selection=[('new', 'New'), ('offer received', 'Offer Received'), ('offer accepted', 'Offer Accepted'), ('sold', 'Sold'), ('canceled', 'Canceled')], default='new')
+        selection=[('new', 'New'), ('offer_received', 'Offer Received'), ('offer_accepted', 'Offer Accepted'), ('sold', 'Sold'), ('canceled', 'Canceled')], default='new')
     total_area = fields.Integer(compute="_compute_total_area")
     best_price = fields.Float(compute="_compute_best_price")
 
@@ -104,7 +104,7 @@ class EstateProperty(models.Model):
                 if offer == accepted_offer:
                     record.selling_price = offer.price
                     record.buyer_id = offer.partner_id
-                    record.state = "offer accepted"
+                    record.state = "offer_accepted"
                 else:
                     offer.status = "refused"
                     print(offer.status)
@@ -113,5 +113,14 @@ class EstateProperty(models.Model):
     def _onchange_offer_ids(self):
         if self.offer_ids:
             if self.state == 'new':
-                self.state = 'offer received'
+                self.state = 'offer_received'
+    
+    def unlink(self):
+        for record in self:
+            if record:
+                if record.state == 'new' or record.state == 'canceled':
+                    return super().unlink()
+                else:
+                    raise exceptions.ValidationError("Only new and canceled properties can be deleted")
+        return True
 

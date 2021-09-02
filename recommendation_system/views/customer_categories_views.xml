@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <!-- Properties View Action -->
+    <record id="custome_categories_action" model="ir.actions.act_window">
+        <field name="name">Customer Categories</field>
+        <field name="res_model">customer.categories</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <!-- Properties Tree View Customization -->
+    <record id="customer_categories_view_tree" model="ir.ui.view">
+        <field name="name">customer.categories.tree</field>
+        <field name="model">customer.categories</field>
+        <field name="arch" type="xml">
+            <tree string="Purchase History">
+                <field name="customer_ids"/>
+                <field name="category_ids"/>
+                <field name="quantity"/>
+            </tree>
+        </field>
+    </record>
+
+</odoo>

@@ -1,4 +1,4 @@
-from odoo import fields, models, api
+from odoo import fields, models, api, exceptions
 from dateutil.relativedelta import relativedelta
 import datetime
 
@@ -52,3 +52,12 @@ class EstatePropertyOffer(models.Model):
         for record in self:
             record.status = "refused"
         return True
+
+    @api.model
+    def create(self, vals):
+        property = self.env['estate.property'].browse(vals['property_id'])
+        if vals['price'] < property.best_price:
+            raise exceptions.UserError("Can't make an offer lower than the expected price")
+        else:
+            property.state = 'offer_received'
+            return super().create(vals)
