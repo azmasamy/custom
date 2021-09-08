@@ -5,7 +5,7 @@ class InheritedProductTemplate(models.Model):
     _inherit = "product.template"
     _name = "product.template"
 
-    quantity_sold = fields.Integer(default=0)
+    quantity_sold = fields.Integer(default=0, readonly=True)
 
     def update_quantity_sold(self, sold_quantity):
         self.quantity_sold += sold_quantity
@@ -21,6 +21,6 @@ class InheritedProductTemplate(models.Model):
         for recommendation in previous_recommendations:
             recommended_products_ids.append(recommendation.id)
         if category == 'best_selling':
-            return set(self.search(args=[('id', 'not in', recommended_products_ids)], limit=records_limit, order='quantity_sold'))
+            return set(self.search(args=[('id', 'not in', recommended_products_ids)], limit=records_limit, order='quantity_sold desc'))
         else:
-            return set(self.search(args=[('categ_id', '=', category.id), ('categ_id', 'not in', recommended_products_ids)], limit=records_limit, order='quantity_sold'))
+            return set(self.search(args=[('categ_id', '=', category.id), ('id', 'not in', recommended_products_ids)], limit=records_limit, order='quantity_sold desc'))

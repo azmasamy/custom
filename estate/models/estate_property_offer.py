@@ -20,7 +20,7 @@ class EstatePropertyOffer(models.Model):
     validity = fields.Integer(default=7)
     date_deadline = fields.Date(compute="_compute_date_deadline", inverse="_compute_validity")
     property_id = fields.Many2one("estate.property", string="Property", required=True)
-    property_type_id = fields.Many2one(related="property_id.type_id", stored=True)
+    property_type_id = fields.Many2one(related="property_id.type_id", store=True)
 
 
     @api.depends("validity")
@@ -57,7 +57,7 @@ class EstatePropertyOffer(models.Model):
     def create(self, vals):
         property = self.env['estate.property'].browse(vals['property_id'])
         if vals['price'] < property.best_price:
-            raise exceptions.UserError("Can't make an offer lower than the expected price")
+            raise exceptions.UserError("Can't make an offer lower than the best price price")
         else:
             property.state = 'offer_received'
             return super().create(vals)

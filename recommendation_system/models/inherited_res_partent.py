@@ -39,7 +39,7 @@ class InheritedResPartner(models.Model):
         for category_purchase in customer_category_purchases:
             total_quantity_sold += category_purchase.quantity
         for category_purchase in customer_category_purchases:
-            recommended_products_count = math.floor(
+            recommended_products_count = math.floor(v
                 (category_purchase.quantity / total_quantity_sold) * 20)
             if recommended_products_count > math.floor(recommendations_requested / 2):
                 recommended_products_count = math.floor(
@@ -60,5 +60,5 @@ class InheritedResPartner(models.Model):
         recommendations_string = ""
         for product in products_recommended:
             recommendations_string += str(product.name) + \
-                " " + str(product.quantity_sold) + "\n"
+                " - " + str(product.quantity_sold) + " - " + str(product.categ_id.name) + "\n"
         return recommendations_string

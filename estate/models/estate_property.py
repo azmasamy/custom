@@ -1,4 +1,4 @@
-from odoo import fields, models, api, exceptions, tools, exceptions
+from odoo import fields, models, api, exceptions, tools
 from dateutil.relativedelta import relativedelta
 
 
@@ -75,7 +75,9 @@ class EstateProperty(models.Model):
         for record in self:
             if record.state == "canceled":
                 raise exceptions.UserError("Property cannot be sold after cancelling")
-            else:    
+            elif record.state != "offer_accepted":
+                raise exceptions.UserError("Property cannot be sold when there is no offer accepted")
+            else:
                 record.state = "sold"
         return True
 

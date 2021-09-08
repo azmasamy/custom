@@ -11,10 +11,14 @@ class CustomerCategories(models.Model):
     quantity = fields.Integer()
 
     def update_customer_categories(self, customer_id, category_id, product_quantity):
-        if not self.search([('customer_ids', '=', customer_id.id), ('category_ids', '=', category_id.id)]):
-            vals = {
+        vals = {
                 'customer_ids': customer_id.id,
                 'category_ids': category_id.id,
                 'quantity': product_quantity
             }
+        res = self.search([('customer_ids', '=', customer_id.id), ('category_ids', '=', category_id.id)])
+        if res:
+            vals['quantity'] += res.quantity
+            res.write(vals)
+        else:
             self.create(vals)
